@@ -12,6 +12,9 @@ import androidx.navigation.Navigation
 import com.dumanyusuf.tabuchallenge.presentation.navigation.PageController
 import com.dumanyusuf.tabuchallenge.presentation.welcome_page.WelcomePage
 import com.dumanyusuf.tabuchallenge.ui.theme.TabuChallengeTheme
+import dagger.hilt.android.AndroidEntryPoint
+
+
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

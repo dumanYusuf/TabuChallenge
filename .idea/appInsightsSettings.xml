@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.dumanyusuf.tabuchallenge" />
+                  <option name="mobileSdkAppId" value="1:427670702971:android:660edf5ac44d8284a8cbde" />
+                  <option name="projectId" value="tabuchallenge-ef813" />
+                  <option name="projectNumber" value="427670702971" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

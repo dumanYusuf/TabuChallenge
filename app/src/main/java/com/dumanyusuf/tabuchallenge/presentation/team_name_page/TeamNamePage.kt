@@ -14,7 +14,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.R
+import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.util.Team1Border
 import com.dumanyusuf.tabuchallenge.util.Team2Border
 
@@ -23,7 +25,8 @@ import com.dumanyusuf.tabuchallenge.util.Team2Border
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamNamePage(
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    navController: NavController
 ) {
     var teamName1 by remember { mutableStateOf("") }
     var teamName2 by remember { mutableStateOf("") }
@@ -158,12 +161,15 @@ fun TeamNamePage(
 
 
                 Button(
-                    onClick = { /* Start game functionality */ },
+                    onClick = {
+                        navController.navigate(Screan.StartingPage.route)
+                    },
                     enabled = teamName1.isNotEmpty()&& teamName2.isNotEmpty(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(16.dp)
+                        ),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)
                     )

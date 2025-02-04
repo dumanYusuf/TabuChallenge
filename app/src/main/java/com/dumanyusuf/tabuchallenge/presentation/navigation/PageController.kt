@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.presentation.how_to_page.HowToPage
+import com.dumanyusuf.tabuchallenge.presentation.starting.StartingPage
 import com.dumanyusuf.tabuchallenge.presentation.welcome_page.WelcomePage
 
 @Composable
@@ -22,9 +23,12 @@ fun PageController() {
             HowToPage(navController = navcontroller)
         }
         composable(Screan.TeamNamePage.route) {
-            TeamNamePage(){
+            TeamNamePage(navController = navcontroller, onBackPress = {
                 navcontroller.popBackStack()
-            }
+            })
+        }
+        composable(Screan.StartingPage.route) {
+            StartingPage()
         }
     }
 
