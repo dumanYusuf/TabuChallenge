@@ -2,6 +2,7 @@ package com.dumanyusuf.tabuchallenge.presentation.navigation
 
 import TeamNamePage
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,6 +10,7 @@ import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.presentation.how_to_page.HowToPage
 import com.dumanyusuf.tabuchallenge.presentation.starting.StartingPage
 import com.dumanyusuf.tabuchallenge.presentation.welcome_page.WelcomePage
+
 
 @Composable
 fun PageController() {

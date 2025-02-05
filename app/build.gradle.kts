@@ -84,6 +84,9 @@ dependencies {
     kapt ("com.google.dagger:hilt-compiler:2.52")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    implementation ("com.google.code.gson:gson:2.12.1")
+
+
     // firebase analilitik
    // implementation("com.google.firebase:firebase-analytics")
 

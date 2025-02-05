@@ -20,10 +20,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dumanyusuf.tabuchallenge.R
+import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun StartingPage() {
+fun StartingPage(
+
+) {
 
     Scaffold(
         content = {
@@ -54,7 +57,7 @@ fun StartingPage() {
                     )
                     Text(
                         style = TextStyle(fontSize = 24.sp, color = Color.White),
-                        text = "Takım adı gelecek",
+                        text = "takım ismi gelecek",
                         modifier = Modifier.padding(bottom = 18.dp)
                     )
                     Text(

@@ -14,19 +14,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.R
 import com.dumanyusuf.tabuchallenge.Screan
+import com.dumanyusuf.tabuchallenge.domain.model.TeamName
+import com.dumanyusuf.tabuchallenge.presentation.team_name_page.TeamNameViewModel
 import com.dumanyusuf.tabuchallenge.util.Team1Border
 import com.dumanyusuf.tabuchallenge.util.Team2Border
-
+import com.google.gson.Gson
+import java.net.URLEncoder
+import java.util.UUID
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamNamePage(
     onBackPress: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    viewModel: TeamNameViewModel= hiltViewModel()
 ) {
     var teamName1 by remember { mutableStateOf("") }
     var teamName2 by remember { mutableStateOf("") }
@@ -162,6 +168,7 @@ fun TeamNamePage(
 
                 Button(
                     onClick = {
+                        viewModel.addTeamName(teamName1,teamName2)
                         navController.navigate(Screan.StartingPage.route)
                     },
                     enabled = teamName1.isNotEmpty()&& teamName2.isNotEmpty(),
