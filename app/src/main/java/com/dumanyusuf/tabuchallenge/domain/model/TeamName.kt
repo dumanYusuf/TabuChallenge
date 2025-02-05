@@ -1,8 +1,8 @@
 package com.dumanyusuf.tabuchallenge.domain.model
 
 data class TeamName(
-    val id:String,
-    val teamName:String,
+    val id:String="",
+    val teamName:String="",
     var score:Int=0,
     var tabuCount:Int=0,
     var correctCount:Int=0,

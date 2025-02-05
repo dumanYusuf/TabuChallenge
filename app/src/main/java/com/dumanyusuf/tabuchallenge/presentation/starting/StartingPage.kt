@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,15 +20,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.R
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
+import com.dumanyusuf.tabuchallenge.presentation.game_screan.GameViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StartingPage(
-navController: NavController
+navController: NavController,
 ) {
 
     Scaffold(
@@ -59,7 +62,7 @@ navController: NavController
                     )
                     Text(
                         style = TextStyle(fontSize = 24.sp, color = Color.White),
-                        text = "takım ismi gelecek",
+                        text = "Takım İsmi Gelecek",
                         modifier = Modifier.padding(bottom = 18.dp)
                     )
                     Text(

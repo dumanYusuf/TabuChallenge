@@ -34,7 +34,7 @@ fun PageController() {
             StartingPage(navcontroller)
         }
         composable(Screan.GameScreanPage.route) {
-           GameScrean()
+           GameScrean(navController = navcontroller)
         }
     }
 

@@ -1,17 +1,25 @@
 package com.dumanyusuf.tabuchallenge.presentation.game_screen
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,13 +28,65 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
+import com.dumanyusuf.tabuchallenge.presentation.game_screan.GameViewModel
 
+@SuppressLint("ContextCastToActivity")
 @Composable
-fun GameScrean() {
+fun GameScrean(
+    viewModel: GameViewModel= hiltViewModel(),
+    navController:NavController
+
+) {
+    val teamlist=viewModel.teamList.collectAsState().value
+    val activity=(LocalContext.current as Activity)
+
+    val showExitDialog = remember { mutableStateOf(false) }
+    val showHomeDialog = remember { mutableStateOf(false) }
+
+
+    BackHandler {
+        showExitDialog.value = true
+    }
+
+    if (showExitDialog.value) {
+        ExitConfirmationDialog(
+            titleText = "Çıkış Onayı",
+            messageText = "Uygulamadan çıkmak istediğinize emin misiniz?",
+            confirmText = "Evet",
+            dismissText = "Hayır",
+            onConfirm = {
+                activity.finish()
+            },
+            onDismiss = {
+                showExitDialog.value = false
+            }
+        )
+    }
+
+    if (showHomeDialog.value) {
+        ExitConfirmationDialog(
+            titleText = "Ana Menü Onayı",
+            messageText = "Ana menüye dönmek istediğinize emin misiniz?",
+            confirmText = "Evet",
+            dismissText = "Hayır",
+            onConfirm = {
+                showHomeDialog.value = false
+                navController.navigate(Screan.WelcomePage.route)
+            },
+            onDismiss = {
+                showHomeDialog.value = false
+            }
+        )
+    }
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,9 +103,11 @@ fun GameScrean() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Row
-        TopPanel()
+        TopPanel(onHomeClick ={
+            showHomeDialog.value=true
+        })
 
-        TeamNameCompose()
+        TeamNameCompose(teamlist)
 
         // Timer & Words List
         WordAndTimerSection()
@@ -56,8 +118,12 @@ fun GameScrean() {
 }
 
 
+
 @Composable
-fun TeamNameCompose() {
+fun TeamNameCompose(teamList: List<TeamName>) {
+    val team1 = teamList.getOrNull(0)
+    val team2 = teamList.getOrNull(1)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,24 +140,24 @@ fun TeamNameCompose() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Birinci Takım ve Skor
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+
             ) {
                 Text(
-                    text = "😊 | 1T ",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(end = 4.dp)
-                )
-                Text(
-                    text = "0",
+                    text = team1?.teamName ?: "Takım 1",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
                 )
+                Text(
+                    text = "skor:0",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
             }
 
-            // Skor Ayracı ve İkinci Takım Skoru
+           // ayraç
             Text(
                 text = "-",
                 color = Color.White,
@@ -99,20 +165,19 @@ fun TeamNameCompose() {
                 fontSize = 24.sp
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Column(
             ) {
                 Text(
-                    text = "0 ",
+                    text = team2?.teamName ?: "Takım 2",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
                 )
                 Text(
-                    text = "2T | 😊",
+                    text = "skor:0",
                     color = Color.White,
                     fontSize = 18.sp,
-                    modifier = Modifier.padding(start = 4.dp)
+                    modifier = Modifier.padding(end = 4.dp)
                 )
             }
         }
@@ -121,7 +186,7 @@ fun TeamNameCompose() {
 
 
 @Composable
-fun TopPanel() {
+fun TopPanel(onHomeClick:()->Unit ){
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -135,7 +200,7 @@ fun TopPanel() {
                 .background(Color(0xFF6A57DB)),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "\uD83C\uDFA7", fontSize = 24.sp, color = Color.White) // 🎧 için Unicode
+            Text(text = "\uD83C\uDFA7", fontSize = 24.sp, color = Color.White)
         }
 
 
@@ -155,7 +220,9 @@ fun TopPanel() {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF6A57DB)),
+                .background(Color(0xFF6A57DB)).padding().clickable {
+                    onHomeClick()
+                },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -225,4 +292,48 @@ fun GameButton(label: String, backgroundColor: Color) {
     ) {
         Text(text = label, color = Color.White, fontSize = 16.sp)
     }
+}
+@Composable
+fun ExitConfirmationDialog(
+    titleText: String,
+    messageText: String,
+    confirmText: String,
+    dismissText: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        containerColor = Color(0xFF6A57DB),
+        onDismissRequest = {},
+        title = {
+            Text(
+                color = Color.White,
+                text = titleText
+            )
+        },
+        text = {
+            Text(
+                color = Color.White,
+                text = messageText
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    fontSize = 24.sp,
+                    color = Color.Yellow,
+                    text = confirmText
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    fontSize = 24.sp,
+                    color = Color.Red,
+                    text = dismissText
+                )
+            }
+        }
+    )
 }
