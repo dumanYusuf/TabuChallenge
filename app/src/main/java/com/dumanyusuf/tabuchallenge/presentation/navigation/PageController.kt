@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dumanyusuf.tabuchallenge.Screan
+import com.dumanyusuf.tabuchallenge.presentation.game_screen.GameScrean
 import com.dumanyusuf.tabuchallenge.presentation.how_to_page.HowToPage
 import com.dumanyusuf.tabuchallenge.presentation.starting.StartingPage
 import com.dumanyusuf.tabuchallenge.presentation.welcome_page.WelcomePage
@@ -30,7 +31,10 @@ fun PageController() {
             })
         }
         composable(Screan.StartingPage.route) {
-            StartingPage()
+            StartingPage(navcontroller)
+        }
+        composable(Screan.GameScreanPage.route) {
+           GameScrean()
         }
     }
 

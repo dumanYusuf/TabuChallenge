@@ -19,13 +19,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.R
+import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StartingPage(
-
+navController: NavController
 ) {
 
     Scaffold(
@@ -68,6 +70,8 @@ fun StartingPage(
                     Button(
                         onClick = {
                             // Oyuna başlama butonu
+                            navController.navigate(Screan.GameScreanPage.route)
+
                         },
                         modifier = Modifier
                             .fillMaxWidth()
