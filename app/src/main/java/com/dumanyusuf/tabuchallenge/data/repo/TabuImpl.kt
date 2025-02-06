@@ -1,7 +1,9 @@
 package com.dumanyusuf.tabuchallenge.data.repo
 
+import android.util.Log
 import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
+import com.dumanyusuf.tabuchallenge.domain.model.Words
 import com.dumanyusuf.tabuchallenge.domain.repo.TabuRepo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -57,5 +59,22 @@ class TabuImpl @Inject constructor(
         return gameSettings
     }
 
+    override suspend fun getWord(): List<Words> {
+        return try {
+            val snapshot = firestore.collection("words").get().await()
+            snapshot.documents.mapNotNull { document ->
+                val word = document.toObject(Words::class.java)
+                if (word != null) {
+                    Log.d("TabuImpl", "Fetched word: $word")
+                } else {
+                    Log.e("TabuImpl", "Failed to deserialize document: ${document.id}")
+                }
+                word
+            }
+        } catch (e: Exception) {
+            Log.e("TabuImpl", "Error getting words1:${e.localizedMessage}")
+            emptyList()
+        }
+    }
 
 }

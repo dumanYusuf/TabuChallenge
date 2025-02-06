@@ -10,12 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -35,37 +30,33 @@ import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
+import com.dumanyusuf.tabuchallenge.domain.model.Words
 import com.dumanyusuf.tabuchallenge.presentation.game_screan.GameViewModel
-import com.dumanyusuf.tabuchallenge.presentation.team_name_page.TeamNameViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun GameScrean(
-    navController:NavController,
+    viewModel: GameViewModel = hiltViewModel(),
+    navController: NavController,
     gameSettings: String,
     teamList: String
 ) {
+    val words= viewModel.wordsState.collectAsState().value
+    val currentWordIndex = viewModel.currentWordIndex.collectAsState().value
 
-    val gameSettings = remember {
-        Gson().fromJson(gameSettings, GameSettings::class.java)
-    }
-
+    val gameSettings = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
     val teamListType = object : TypeToken<List<TeamName>>() {}.type
     val teamList: List<TeamName> = remember {
         Gson().fromJson(teamList, teamListType)
     }
 
-
-    val activity=(LocalContext.current as Activity)
+    val activity = (LocalContext.current as Activity)
 
     val showExitDialog = remember { mutableStateOf(false) }
     val showHomeDialog = remember { mutableStateOf(false) }
-
-
-
 
     BackHandler {
         showExitDialog.value = true
@@ -102,8 +93,6 @@ fun GameScrean(
         )
     }
 
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -120,21 +109,19 @@ fun GameScrean(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Row
-        TopPanel(onHomeClick ={
-            showHomeDialog.value=true
+        TopPanel(onHomeClick = {
+            showHomeDialog.value = true
         })
 
         TeamNameCompose(teamList)
 
         // Timer & Words List
-        WordAndTimerSection(gameSettings = gameSettings)
+        WordAndTimerSection(gameSettings = gameSettings, words, currentWordIndex)
 
         // Buttons Section
-        ActionButtonsRow(gameSettings)
+        ActionButtonsRow(gameSettings, viewModel::onCorrect)
     }
 }
-
-
 
 @Composable
 fun TeamNameCompose(teamList: List<TeamName>) {
@@ -157,9 +144,8 @@ fun TeamNameCompose(teamList: List<TeamName>) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Birinci Takım ve Skor
-            Column(
+            Column {
 
-            ) {
                 Text(
                     text = team1?.teamName ?: "Takım 1",
                     color = Color.White,
@@ -174,7 +160,7 @@ fun TeamNameCompose(teamList: List<TeamName>) {
                 )
             }
 
-           // ayraç
+            // ayraç
             Text(
                 text = "-",
                 color = Color.White,
@@ -182,8 +168,7 @@ fun TeamNameCompose(teamList: List<TeamName>) {
                 fontSize = 24.sp
             )
 
-            Column(
-            ) {
+            Column {
                 Text(
                     text = team2?.teamName ?: "Takım 2",
                     color = Color.White,
@@ -201,9 +186,8 @@ fun TeamNameCompose(teamList: List<TeamName>) {
     }
 }
 
-
 @Composable
-fun TopPanel(onHomeClick:()->Unit ){
+fun TopPanel(onHomeClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -219,7 +203,6 @@ fun TopPanel(onHomeClick:()->Unit ){
         ) {
             Text(text = "\uD83C\uDFA7", fontSize = 24.sp, color = Color.White)
         }
-
 
         // Pause Button
         Box(
@@ -237,9 +220,9 @@ fun TopPanel(onHomeClick:()->Unit ){
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF6A57DB)).padding().clickable {
-                    onHomeClick()
-                },
+                .background(Color(0xFF6A57DB))
+                .padding()
+                .clickable { onHomeClick() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -252,7 +235,7 @@ fun TopPanel(onHomeClick:()->Unit ){
 }
 
 @Composable
-fun WordAndTimerSection(gameSettings: GameSettings) {
+fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentWordIndex: Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -274,18 +257,32 @@ fun WordAndTimerSection(gameSettings: GameSettings) {
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("FABL", fontSize = 24.sp, color = Color.White)
+            if (words.isNotEmpty()) {
+                val word = words[currentWordIndex]
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(word.mainWord, fontSize = 24.sp, color = Color.White)
 
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Insan\nMasal\nLa Fontaine\nHayvan\nHikaye", color = Color.White, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = word.forbiddenWords.joinToString("\n"),
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                Text(
+                    text = "No words available",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
 }
 
 @Composable
-fun ActionButtonsRow(gameSettings: GameSettings) {
+fun ActionButtonsRow(gameSettings: GameSettings, onCorrect: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -294,16 +291,14 @@ fun ActionButtonsRow(gameSettings: GameSettings) {
     ) {
         GameButton("TABUU", Color(0xFFD32F2F))
         GameButton("PAS(${gameSettings.passCount})", Color(0xFFFF9800))
-        GameButton("DOĞRU", Color(0xFF388E3C))
+        GameButton("DOĞRU", Color(0xFF388E3C), onCorrect)
     }
 }
 
 @Composable
-fun GameButton(text: String, backgroundColor: Color,) {
+fun GameButton(text: String, backgroundColor: Color, onClick: () -> Unit = {}) {
     Button(
-        onClick = {
-
-        },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor),
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
@@ -312,6 +307,7 @@ fun GameButton(text: String, backgroundColor: Color,) {
         Text(text = text, color = Color.White, fontSize = 16.sp)
     }
 }
+
 @Composable
 fun ExitConfirmationDialog(
     titleText: String,
