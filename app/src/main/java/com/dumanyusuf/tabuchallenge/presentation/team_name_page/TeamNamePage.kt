@@ -175,7 +175,15 @@ fun TeamNamePage(
 
                         val gameSettings = GameSettings(gameTime = sliderValueTime, passCount = sliderValueType, roundCount = sliderValueNext)
                         val gameSettingsJson = Gson().toJson(gameSettings)
-                        navController.navigate(Screan.GameScreanPage.route+"/$gameSettingsJson")
+
+                        val teamList = listOf(
+                            TeamName(id = "", teamName = teamName1, score = 0),
+                            TeamName(id = "", teamName = teamName2, score = 0)
+                        )
+                        val teamListJson = Gson().toJson(teamList)
+
+
+                        navController.navigate(Screan.GameScreanPage.route+"/$gameSettingsJson/$teamListJson")
                     },
                     enabled = teamName1.isNotEmpty()&& teamName2.isNotEmpty(),
                     modifier = Modifier

@@ -8,7 +8,7 @@ import javax.inject.Inject
 class TeamNameUseCase @Inject constructor(private val repo: TabuRepo){
 
 
-   suspend fun addTeam(team1:String,team2:String){
+   suspend fun addTeam(team1:String,team2:String):List<TeamName>{
         return repo.addTeamFirebase(team1, team2)
     }
 

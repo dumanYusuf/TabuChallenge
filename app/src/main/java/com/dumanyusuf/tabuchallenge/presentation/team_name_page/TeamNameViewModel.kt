@@ -34,8 +34,6 @@ class TeamNameViewModel @Inject constructor(
         viewModelScope.launch {
             try {
            teamNameUseCase.addSettings(time, passCount, roundCount)
-
-
                 Log.e("Başarılı", "Takım başarıyla eklendi.")
             } catch (e: Exception) {
                 Log.e("Hata", "Firebase ekleme hatası: ${e.message}")

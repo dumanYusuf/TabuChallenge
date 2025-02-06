@@ -16,7 +16,7 @@ class TabuImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : TabuRepo {
 
-    override suspend fun addTeamFirebase(team1: String, team2: String) {
+    override suspend fun addTeamFirebase(team1: String, team2: String) :List<TeamName>{
 
         // Mevcut takımları temizle
         firestore.collection("teams").get().await().documents.forEach {
@@ -38,27 +38,7 @@ class TabuImpl @Inject constructor(
             .document(team2Id)
             .set(team2Data.toMap())
             .await()
-    }
-
-    override suspend fun getTeamList():Flow< List<TeamName>>  = callbackFlow{
-        val listenerRegistration = firestore.collection("teams").addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                close(e)
-                return@addSnapshotListener
-            }
-
-            val teamList = mutableListOf<TeamName>()
-            if (snapshot != null) {
-                for (document in snapshot.documents) {
-                    val team = document.toObject(TeamName::class.java)
-                    if (team != null) {
-                        teamList.add(team)
-                    }
-                }
-            }
-            trySend(teamList).isSuccess
-        }
-        awaitClose { listenerRegistration.remove() }
+        return listOf(team1Data,team2Data)
     }
 
     override suspend fun addGameSettings(time: Int, passCount: Int, roundCount: Int): GameSettings {

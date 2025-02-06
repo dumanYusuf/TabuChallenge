@@ -38,20 +38,27 @@ import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import com.dumanyusuf.tabuchallenge.presentation.game_screan.GameViewModel
 import com.dumanyusuf.tabuchallenge.presentation.team_name_page.TeamNameViewModel
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun GameScrean(
-    viewModel: GameViewModel= hiltViewModel(),
     navController:NavController,
-    gameSettings: String
+    gameSettings: String,
+    teamList: String
 ) {
-
 
     val gameSettings = remember {
         Gson().fromJson(gameSettings, GameSettings::class.java)
     }
-    val teamlist=viewModel.teamList.collectAsState().value
+
+
+    val teamListType = object : TypeToken<List<TeamName>>() {}.type
+    val teamList: List<TeamName> = remember {
+        Gson().fromJson(teamList, teamListType)
+    }
+
+
     val activity=(LocalContext.current as Activity)
 
     val showExitDialog = remember { mutableStateOf(false) }
@@ -117,7 +124,7 @@ fun GameScrean(
             showHomeDialog.value=true
         })
 
-        TeamNameCompose(teamlist)
+        TeamNameCompose(teamList)
 
         // Timer & Words List
         WordAndTimerSection(gameSettings = gameSettings)

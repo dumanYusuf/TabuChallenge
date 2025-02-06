@@ -34,11 +34,18 @@ fun PageController() {
             StartingPage(navcontroller)
         }*/
         composable(
-            Screan.GameScreanPage.route + "/{gameSettingsJson}",
-            arguments = listOf(navArgument("gameSettingsJson") { type = NavType.StringType })
+            Screan.GameScreanPage.route + "/{gameSettingsJson}/{teamListJson}",
+            arguments = listOf(
+                navArgument("gameSettingsJson") { type = NavType.StringType },
+                navArgument("teamListJson") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val gameSettingsJson = backStackEntry.arguments?.getString("gameSettingsJson")
-            GameScrean(navController = navcontroller, gameSettings = gameSettingsJson!!)
+            val teamListJson = backStackEntry.arguments?.getString("teamListJson")!!
+            GameScrean(
+                navController = navcontroller,
+                gameSettings = gameSettingsJson!!,
+                teamList = teamListJson)
         }
     }
 
