@@ -33,21 +33,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.Screan
+import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import com.dumanyusuf.tabuchallenge.presentation.game_screan.GameViewModel
+import com.dumanyusuf.tabuchallenge.presentation.team_name_page.TeamNameViewModel
+import com.google.gson.Gson
 
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun GameScrean(
     viewModel: GameViewModel= hiltViewModel(),
-    navController:NavController
-
+    navController:NavController,
+    gameSettings: String
 ) {
+
+
+    val gameSettings = remember {
+        Gson().fromJson(gameSettings, GameSettings::class.java)
+    }
     val teamlist=viewModel.teamList.collectAsState().value
     val activity=(LocalContext.current as Activity)
 
     val showExitDialog = remember { mutableStateOf(false) }
     val showHomeDialog = remember { mutableStateOf(false) }
+
+
 
 
     BackHandler {
@@ -110,10 +120,10 @@ fun GameScrean(
         TeamNameCompose(teamlist)
 
         // Timer & Words List
-        WordAndTimerSection()
+        WordAndTimerSection(gameSettings = gameSettings)
 
         // Buttons Section
-        ActionButtonsRow()
+        ActionButtonsRow(gameSettings)
     }
 }
 
@@ -235,13 +245,13 @@ fun TopPanel(onHomeClick:()->Unit ){
 }
 
 @Composable
-fun WordAndTimerSection() {
+fun WordAndTimerSection(gameSettings: GameSettings) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "42",
+            text = gameSettings.gameTime.toString(),
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -268,7 +278,7 @@ fun WordAndTimerSection() {
 }
 
 @Composable
-fun ActionButtonsRow() {
+fun ActionButtonsRow(gameSettings: GameSettings) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -276,21 +286,23 @@ fun ActionButtonsRow() {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         GameButton("TABUU", Color(0xFFD32F2F))
-        GameButton("PAS(3)", Color(0xFFFF9800))
+        GameButton("PAS(${gameSettings.passCount})", Color(0xFFFF9800))
         GameButton("DOĞRU", Color(0xFF388E3C))
     }
 }
 
 @Composable
-fun GameButton(label: String, backgroundColor: Color) {
+fun GameButton(text: String, backgroundColor: Color,) {
     Button(
-        onClick = {},
+        onClick = {
+
+        },
         colors = ButtonDefaults.buttonColors(backgroundColor),
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
             .padding(4.dp)
     ) {
-        Text(text = label, color = Color.White, fontSize = 16.sp)
+        Text(text = text, color = Color.White, fontSize = 16.sp)
     }
 }
 @Composable

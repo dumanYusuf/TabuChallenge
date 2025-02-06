@@ -1,5 +1,6 @@
 package com.dumanyusuf.tabuchallenge.data.repo
 
+import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import com.dumanyusuf.tabuchallenge.domain.repo.TabuRepo
 import com.google.firebase.firestore.FirebaseFirestore
@@ -58,6 +59,22 @@ class TabuImpl @Inject constructor(
             trySend(teamList).isSuccess
         }
         awaitClose { listenerRegistration.remove() }
+    }
+
+    override suspend fun addGameSettings(time: Int, passCount: Int, roundCount: Int): GameSettings {
+        val gameSettings = GameSettings(
+            settingId = UUID.randomUUID().toString(),
+            gameTime = time,
+            passCount = passCount,
+            roundCount = roundCount
+        )
+
+        firestore.collection("settings")
+            .document(gameSettings.settingId)
+            .set(gameSettings.toMap())
+            .await()
+
+        return gameSettings
     }
 
 

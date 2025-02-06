@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import com.dumanyusuf.tabuchallenge.domain.use_case.team_name.TeamNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,6 +22,20 @@ class TeamNameViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 teamNameUseCase.addTeam(team1, team2)
+                Log.e("Başarılı", "Takım başarıyla eklendi.")
+            } catch (e: Exception) {
+                Log.e("Hata", "Firebase ekleme hatası: ${e.message}")
+            }
+        }
+
+    }
+
+    fun addSettinfgd(time: Int, passCount: Int, roundCount: Int){
+        viewModelScope.launch {
+            try {
+           teamNameUseCase.addSettings(time, passCount, roundCount)
+
+
                 Log.e("Başarılı", "Takım başarıyla eklendi.")
             } catch (e: Exception) {
                 Log.e("Hata", "Firebase ekleme hatası: ${e.message}")

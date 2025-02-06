@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.R
 import com.dumanyusuf.tabuchallenge.Screan
+import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import com.dumanyusuf.tabuchallenge.presentation.team_name_page.TeamNameViewModel
 import com.dumanyusuf.tabuchallenge.util.Team1Border
@@ -36,6 +37,7 @@ fun TeamNamePage(
 ) {
     var teamName1 by remember { mutableStateOf("") }
     var teamName2 by remember { mutableStateOf("") }
+
     var showGameSettingsDialog by remember { mutableStateOf(false) }
     var sliderValueTime by remember { mutableStateOf(45) }
     var sliderValueType by remember { mutableStateOf(1) }
@@ -169,7 +171,11 @@ fun TeamNamePage(
                 Button(
                     onClick = {
                         viewModel.addTeamName(teamName1,teamName2)
-                        navController.navigate(Screan.StartingPage.route)
+                        viewModel.addSettinfgd(sliderValueTime,sliderValueType,sliderValueNext)
+
+                        val gameSettings = GameSettings(gameTime = sliderValueTime, passCount = sliderValueType, roundCount = sliderValueNext)
+                        val gameSettingsJson = Gson().toJson(gameSettings)
+                        navController.navigate(Screan.GameScreanPage.route+"/$gameSettingsJson")
                     },
                     enabled = teamName1.isNotEmpty()&& teamName2.isNotEmpty(),
                     modifier = Modifier
@@ -253,7 +259,10 @@ fun GameSettingsDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onDismissRequest) {
+            Button(
+                onClick = onDismissRequest
+
+            ) {
                 Text("Tamam")
             }
         }
