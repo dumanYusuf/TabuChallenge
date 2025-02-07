@@ -22,6 +22,12 @@ class GameViewModel @Inject constructor(
     private val _currentWordIndex = MutableStateFlow(0)
     val currentWordIndex: StateFlow<Int> = _currentWordIndex
 
+    private val _currentTeamIndex = MutableStateFlow(0)
+    val currentTeamIndex: StateFlow<Int> = _currentTeamIndex
+
+    private val _teamScores = MutableStateFlow(listOf(0, 0))
+    val teamScores: StateFlow<List<Int>> = _teamScores
+
     init {
         fetchWords()
     }
@@ -29,7 +35,8 @@ class GameViewModel @Inject constructor(
     private fun fetchWords() {
         viewModelScope.launch {
             try {
-               _wordsState.value= gameScreanUseCase.getWords()
+             val words= gameScreanUseCase.getWords()
+                _wordsState.value=words.shuffled()
                 Log.d("GameViewModel", "Fetched words: $_wordsState")
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Error fetching words", e)
@@ -39,5 +46,12 @@ class GameViewModel @Inject constructor(
 
     fun onCorrect() {
         _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
+        updateTeamScore()
+    }
+
+    private fun updateTeamScore() {
+        val updatedScores = _teamScores.value.toMutableList()
+        updatedScores[_currentTeamIndex.value] += 1
+        _teamScores.value = updatedScores
     }
 }

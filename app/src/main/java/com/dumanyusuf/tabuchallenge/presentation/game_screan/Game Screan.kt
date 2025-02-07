@@ -45,6 +45,7 @@ fun GameScrean(
 ) {
     val words= viewModel.wordsState.collectAsState().value
     val currentWordIndex = viewModel.currentWordIndex.collectAsState().value
+    val teamScore=viewModel.teamScores.collectAsState().value
 
     val gameSettings = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
@@ -113,7 +114,7 @@ fun GameScrean(
             showHomeDialog.value = true
         })
 
-        TeamNameCompose(teamList)
+        TeamNameCompose(teamList,teamScore)
 
         // Timer & Words List
         WordAndTimerSection(gameSettings = gameSettings, words, currentWordIndex)
@@ -124,7 +125,7 @@ fun GameScrean(
 }
 
 @Composable
-fun TeamNameCompose(teamList: List<TeamName>) {
+fun TeamNameCompose(teamList: List<TeamName>,teamScore:List<Int>) {
     val team1 = teamList.getOrNull(0)
     val team2 = teamList.getOrNull(1)
 
@@ -153,7 +154,7 @@ fun TeamNameCompose(teamList: List<TeamName>) {
                     fontSize = 24.sp
                 )
                 Text(
-                    text = "skor:0",
+                    text = teamScore.getOrNull(0)?.toString() ?: "0",
                     color = Color.White,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(end = 4.dp)
@@ -176,7 +177,7 @@ fun TeamNameCompose(teamList: List<TeamName>) {
                     fontSize = 24.sp
                 )
                 Text(
-                    text = "skor:0",
+                    text = teamScore.getOrNull(1)?.toString() ?: "0",
                     color = Color.White,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(end = 4.dp)
