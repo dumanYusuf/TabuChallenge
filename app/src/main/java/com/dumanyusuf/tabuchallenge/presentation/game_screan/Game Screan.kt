@@ -11,10 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,11 +40,16 @@ fun GameScrean(
     gameSettings: String,
     teamList: String
 ) {
-    val words= viewModel.wordsState.collectAsState().value
+    val words = viewModel.wordsState.collectAsState().value
     val currentWordIndex = viewModel.currentWordIndex.collectAsState().value
-    val teamScore=viewModel.teamScores.collectAsState().value
+    val teamScore = viewModel.teamScores.collectAsState().value
+    val passCount = viewModel.passCount.collectAsState().value
 
-    val gameSettings = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
+    val gameSettingsObj = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
+
+    LaunchedEffect(gameSettingsObj) {
+        viewModel.setPassCount(gameSettingsObj.roundCount)
+    }
 
     val teamListType = object : TypeToken<List<TeamName>>() {}.type
     val teamList: List<TeamName> = remember {
@@ -114,18 +116,18 @@ fun GameScrean(
             showHomeDialog.value = true
         })
 
-        TeamNameCompose(teamList,teamScore)
+        TeamNameCompose(teamList, teamScore)
 
         // Timer & Words List
-        WordAndTimerSection(gameSettings = gameSettings, words, currentWordIndex)
+        WordAndTimerSection(gameSettings = gameSettingsObj, words, currentWordIndex)
 
         // Buttons Section
-        ActionButtonsRow(gameSettings, viewModel::onCorrect)
+        ActionButtonsRow(viewModel::onCorrect, viewModel::onTabu, viewModel::onPass, passCount)
     }
 }
 
 @Composable
-fun TeamNameCompose(teamList: List<TeamName>,teamScore:List<Int>) {
+fun TeamNameCompose(teamList: List<TeamName>, teamScore: List<Int>) {
     val team1 = teamList.getOrNull(0)
     val team2 = teamList.getOrNull(1)
 
@@ -283,27 +285,28 @@ fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentW
 }
 
 @Composable
-fun ActionButtonsRow(gameSettings: GameSettings, onCorrect: () -> Unit) {
+fun ActionButtonsRow(onCorrect: () -> Unit, onTabu: () -> Unit, onPass: () -> Unit, passCount: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        GameButton("TABUU", Color(0xFFD32F2F))
-        GameButton("PAS(${gameSettings.passCount})", Color(0xFFFF9800))
+        GameButton("TABUU", Color(0xFFD32F2F), onTabu)
+        GameButton("PAS(${passCount})", Color(0xFFFF9800), onPass, passCount > 0)
         GameButton("DOĞRU", Color(0xFF388E3C), onCorrect)
     }
 }
 
 @Composable
-fun GameButton(text: String, backgroundColor: Color, onClick: () -> Unit = {}) {
+fun GameButton(text: String, backgroundColor: Color, onClick: () -> Unit = {}, enabled: Boolean = true) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor),
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .padding(4.dp)
+            .padding(4.dp),
+        enabled = enabled
     ) {
         Text(text = text, color = Color.White, fontSize = 16.sp)
     }
