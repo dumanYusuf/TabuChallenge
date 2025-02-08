@@ -10,7 +10,9 @@ import androidx.navigation.navArgument
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.presentation.game_screen.GameScrean
 import com.dumanyusuf.tabuchallenge.presentation.how_to_page.HowToPage
+import com.dumanyusuf.tabuchallenge.presentation.next_team_page.NextTeamPage
 import com.dumanyusuf.tabuchallenge.presentation.welcome_page.WelcomePage
+import com.dumanyusuf.tabuchallenge.presentation.win_team_page.WinTeamPage
 
 
 @Composable
@@ -30,9 +32,7 @@ fun PageController() {
                 navcontroller.popBackStack()
             })
         }
-        /*composable(Screan.StartingPage.route) {
-            StartingPage(navcontroller)
-        }*/
+
         composable(
             Screan.GameScreanPage.route + "/{gameSettingsJson}/{teamListJson}",
             arguments = listOf(
@@ -46,6 +46,12 @@ fun PageController() {
                 navController = navcontroller,
                 gameSettings = gameSettingsJson!!,
                 teamList = teamListJson)
+        }
+        composable(Screan.NextTeamPage.route) {
+            NextTeamPage()
+        }
+        composable(Screan.WinTeamPage.route) {
+            WinTeamPage()
         }
     }
 

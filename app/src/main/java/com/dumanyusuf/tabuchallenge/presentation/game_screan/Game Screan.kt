@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
@@ -44,11 +45,14 @@ fun GameScrean(
     val currentWordIndex = viewModel.currentWordIndex.collectAsState().value
     val teamScore = viewModel.teamScores.collectAsState().value
     val passCount = viewModel.passCount.collectAsState().value
+    val time=viewModel.time.collectAsState().value
+
 
     val gameSettingsObj = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
     LaunchedEffect(gameSettingsObj) {
         viewModel.setPassCount(gameSettingsObj.roundCount)
+        viewModel.timerGame(gameSettingsObj)
     }
 
     val teamListType = object : TypeToken<List<TeamName>>() {}.type
@@ -119,7 +123,7 @@ fun GameScrean(
         TeamNameCompose(teamList, teamScore)
 
         // Timer & Words List
-        WordAndTimerSection(gameSettings = gameSettingsObj, words, currentWordIndex)
+        WordAndTimerSection(gameSettings = gameSettingsObj, words, currentWordIndex,time)
 
         // Buttons Section
         ActionButtonsRow(viewModel::onCorrect, viewModel::onTabu, viewModel::onPass, passCount)
@@ -238,13 +242,13 @@ fun TopPanel(onHomeClick: () -> Unit) {
 }
 
 @Composable
-fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentWordIndex: Int) {
+fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentWordIndex: Int,gameTime:Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = gameSettings.gameTime.toString(),
+            text = gameTime.toString(),
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,

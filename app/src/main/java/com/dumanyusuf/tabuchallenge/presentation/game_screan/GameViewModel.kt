@@ -3,11 +3,15 @@ package com.dumanyusuf.tabuchallenge.presentation.game_screan
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
 import com.dumanyusuf.tabuchallenge.domain.model.Words
 import com.dumanyusuf.tabuchallenge.domain.use_case.game_screan.GameScreanUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,8 +35,12 @@ class GameViewModel @Inject constructor(
     private val _passCount = MutableStateFlow<Int>(0)
     val passCount: StateFlow<Int> = _passCount
 
+    private val _time=MutableStateFlow<Int>(0)
+    val time:StateFlow<Int> =_time.asStateFlow()
+
     init {
         fetchWords()
+
     }
 
     private fun fetchWords() {
@@ -46,6 +54,17 @@ class GameViewModel @Inject constructor(
             }
         }
     }
+
+    fun timerGame(gameSettings: GameSettings) {
+        viewModelScope.launch {
+            _time.value = gameSettings.gameTime
+            while (_time.value > 0) {
+                delay(1000)
+                _time.value--
+            }
+        }
+    }
+
 
     fun setPassCount(count: Int) {
         _passCount.value = count
