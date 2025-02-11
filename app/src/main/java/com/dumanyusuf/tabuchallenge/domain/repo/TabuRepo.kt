@@ -9,5 +9,5 @@ interface TabuRepo{
     suspend fun addTeamFirebase(team1:String,team2:String):List<TeamName>
     suspend fun addGameSettings(time:Int,passCount:Int,roundCount:Int):GameSettings
     suspend fun getWord():List<Words>
-
+    suspend fun updateTeamScore(teamId: String, score: Int)
 }

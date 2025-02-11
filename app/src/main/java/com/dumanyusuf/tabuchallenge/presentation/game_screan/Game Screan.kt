@@ -43,21 +43,44 @@ fun GameScrean(
 ) {
     val words = viewModel.wordsState.collectAsState().value
     val currentWordIndex = viewModel.currentWordIndex.collectAsState().value
-    val teamScore = viewModel.teamScores.collectAsState().value
+    val currentScore = viewModel.score.collectAsState().value
     val passCount = viewModel.passCount.collectAsState().value
-    val time=viewModel.time.collectAsState().value
+    val time = viewModel.time.collectAsState().value
 
 
     val gameSettingsObj = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
     LaunchedEffect(gameSettingsObj) {
         viewModel.setPassCount(gameSettingsObj.roundCount)
-        viewModel.timerGame(gameSettingsObj)
+        // İkinci takım için firstTeamScore'u kontrol et
+        val teamListObj = Gson().fromJson<List<TeamName>>(teamList, object : TypeToken<List<TeamName>>() {}.type)
+        val firstTeamScore = teamListObj.firstOrNull()?.firstTeamScore ?: 0
+        viewModel.timerGame(gameSettingsObj, firstTeamScore != 0, firstTeamScore)
     }
 
     val teamListType = object : TypeToken<List<TeamName>>() {}.type
     val teamList: List<TeamName> = remember {
         Gson().fromJson(teamList, teamListType)
+    }
+
+    // Süre bittiğinde yönlendirme yap
+    val navigateToNextTeam = viewModel.navigateToNextTeam.collectAsStateWithLifecycle().value
+    val navigateToWinTeam = viewModel.navigateToWinTeam.collectAsStateWithLifecycle().value
+
+    LaunchedEffect(navigateToNextTeam) {
+        if (navigateToNextTeam) {
+            // İlk takımın skorunu ve game settings'i NextTeamPage'e gönder
+            val currentScore = viewModel.getCurrentScore()
+            navController.navigate(Screan.NextTeamPage.createRoute(currentScore, gameSettings))
+        }
+    }
+
+    LaunchedEffect(navigateToWinTeam) {
+        if (navigateToWinTeam) {
+            // Kazanan takımı belirle ve WinTeamPage'e yönlendir
+            val winningTeam = viewModel.getWinningTeam()
+            navController.navigate(Screan.WinTeamPage.createRoute(winningTeam))
+        }
     }
 
     val activity = (LocalContext.current as Activity)
@@ -120,7 +143,7 @@ fun GameScrean(
             showHomeDialog.value = true
         })
 
-        TeamNameCompose(teamList, teamScore)
+        TeamNameCompose(teamList[0], currentScore)
 
         // Timer & Words List
         WordAndTimerSection(gameSettings = gameSettingsObj, words, currentWordIndex,time)
@@ -131,10 +154,7 @@ fun GameScrean(
 }
 
 @Composable
-fun TeamNameCompose(teamList: List<TeamName>, teamScore: List<Int>) {
-    val team1 = teamList.getOrNull(0)
-    val team2 = teamList.getOrNull(1)
-
+fun TeamNameCompose(team: TeamName, score: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,52 +163,24 @@ fun TeamNameCompose(teamList: List<TeamName>, teamScore: List<Int>) {
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFF8A72E0))
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Birinci Takım ve Skor
-            Column {
-
-                Text(
-                    text = team1?.teamName ?: "Takım 1",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-                Text(
-                    text = teamScore.getOrNull(0)?.toString() ?: "0",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(end = 4.dp)
-                )
-            }
-
-            // ayraç
             Text(
-                text = "-",
+                text = team.teamName,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp
             )
-
-            Column {
-                Text(
-                    text = team2?.teamName ?: "Takım 2",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-                Text(
-                    text = teamScore.getOrNull(1)?.toString() ?: "0",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(end = 4.dp)
-                )
-            }
+            Text(
+                text = score.toString(),
+                color = Color.White,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

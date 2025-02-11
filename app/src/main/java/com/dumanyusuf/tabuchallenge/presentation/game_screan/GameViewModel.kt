@@ -19,6 +19,14 @@ import javax.inject.Inject
 class GameViewModel @Inject constructor(
     private val gameScreanUseCase: GameScreanUseCase
 ) : ViewModel() {
+    private val _navigateToNextTeam = MutableStateFlow(false)
+    val navigateToNextTeam: StateFlow<Boolean> = _navigateToNextTeam
+
+    private val _navigateToWinTeam = MutableStateFlow(false)
+    val navigateToWinTeam: StateFlow<Boolean> = _navigateToWinTeam
+
+    private var isSecondTeam = false
+    private var firstTeamScore = 0
 
     private val _wordsState = MutableStateFlow<List<Words>>(emptyList())
     val wordsState: StateFlow<List<Words>> = _wordsState
@@ -26,11 +34,8 @@ class GameViewModel @Inject constructor(
     private val _currentWordIndex = MutableStateFlow(0)
     val currentWordIndex: StateFlow<Int> = _currentWordIndex
 
-    private val _currentTeamIndex = MutableStateFlow(0)
-    val currentTeamIndex: StateFlow<Int> = _currentTeamIndex
-
-    private val _teamScores = MutableStateFlow(listOf(0, 0))
-    val teamScores: StateFlow<List<Int>> = _teamScores
+    private val _score = MutableStateFlow(0)
+    val score: StateFlow<Int> = _score
 
     private val _passCount = MutableStateFlow<Int>(0)
     val passCount: StateFlow<Int> = _passCount
@@ -55,13 +60,33 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun timerGame(gameSettings: GameSettings) {
+    fun timerGame(gameSettings: GameSettings, secondTeam: Boolean = false, firstTeamScore: Int = 0) {
+        isSecondTeam = secondTeam
+        this.firstTeamScore = firstTeamScore
+
         viewModelScope.launch {
             _time.value = gameSettings.gameTime
             while (_time.value > 0) {
                 delay(1000)
                 _time.value--
             }
+            
+            if (isSecondTeam) {
+                // İkinci takımın süresi bitti, WinTeamPage'e yönlendir
+                _navigateToWinTeam.value = true
+            } else {
+                // İlk takımın süresi bitti, NextTeamPage'e yönlendir
+                _navigateToNextTeam.value = true
+            }
+        }
+    }
+
+    fun getWinningTeam(): String {
+        val secondTeamScore = _score.value
+        return when {
+            firstTeamScore > secondTeamScore -> "Takım 1"
+            secondTeamScore > firstTeamScore -> "Takım 2"
+            else -> "Berabere"
         }
     }
 
@@ -80,6 +105,8 @@ class GameViewModel @Inject constructor(
         updateTeamScore(-1)
     }
 
+    fun getCurrentScore(): Int = _score.value
+
     fun onPass() {
         if (_passCount.value > 0) {
             _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
@@ -88,8 +115,6 @@ class GameViewModel @Inject constructor(
     }
 
     private fun updateTeamScore(scoreChange: Int) {
-        val updatedScores = _teamScores.value.toMutableList()
-        updatedScores[_currentTeamIndex.value] += scoreChange
-        _teamScores.value = updatedScores
+        _score.value += scoreChange
     }
 }

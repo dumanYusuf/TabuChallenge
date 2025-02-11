@@ -6,9 +6,11 @@ import javax.inject.Inject
 
 class GameScreanUseCase @Inject constructor(private val repo: TabuRepo) {
 
-
     suspend fun getWords():List<Words>{
         return repo.getWord()
     }
 
+    suspend fun updateTeamScore(teamId: String, score: Int) {
+        repo.updateTeamScore(teamId, score)
+    }
 }

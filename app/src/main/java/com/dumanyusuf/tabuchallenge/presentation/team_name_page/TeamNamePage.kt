@@ -39,7 +39,7 @@ fun TeamNamePage(
     var teamName2 by remember { mutableStateOf("") }
 
     var showGameSettingsDialog by remember { mutableStateOf(false) }
-    var sliderValueTime by remember { mutableStateOf(45) }
+    var sliderValueTime by remember { mutableStateOf(10) }
     var sliderValueType by remember { mutableStateOf(1) }
     var sliderValueNext by remember { mutableStateOf(3) }
 
@@ -241,7 +241,7 @@ fun GameSettingsDialog(
                 Slider(
                     value = sliderValueTime.toFloat(),
                     onValueChange = {onSliderValueTimeChange(it.toInt())},
-                    valueRange = 45f..90f,
+                    valueRange = 10f..90f,
                     steps = 9
                 )
                 Spacer(modifier = Modifier.height(16.dp))

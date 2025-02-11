@@ -47,11 +47,33 @@ fun PageController() {
                 gameSettings = gameSettingsJson!!,
                 teamList = teamListJson)
         }
-        composable(Screan.NextTeamPage.route) {
-            NextTeamPage()
+        composable(
+            route = Screan.NextTeamPage.route,
+            arguments = listOf(
+                navArgument("firstTeamScore") { type = NavType.IntType },
+                navArgument("gameSettings") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val firstTeamScore = backStackEntry.arguments?.getInt("firstTeamScore") ?: 0
+            val gameSettings = backStackEntry.arguments?.getString("gameSettings") ?: ""
+            NextTeamPage(
+                firstTeamScore = firstTeamScore,
+                gameSettings = gameSettings,
+                navController = navcontroller
+            )
         }
-        composable(Screan.WinTeamPage.route) {
-            WinTeamPage()
+
+        composable(
+            route = Screan.WinTeamPage.route,
+            arguments = listOf(
+                navArgument("winningTeam") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val winningTeam = backStackEntry.arguments?.getString("winningTeam") ?: ""
+            WinTeamPage(
+                winningTeam = winningTeam,
+                navController = navcontroller
+            )
         }
     }
 

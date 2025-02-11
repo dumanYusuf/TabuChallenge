@@ -77,4 +77,14 @@ class TabuImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateTeamScore(teamId: String, score: Int) {
+        try {
+            firestore.collection("teams")
+                .document(teamId)
+                .update("score", score)
+                .await()
+        } catch (e: Exception) {
+            Log.e("TabuImpl", "Error updating team score: ${e.localizedMessage}")
+        }
+    }
 }
