@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val gameScreanUseCase: GameScreanUseCase
@@ -118,11 +119,13 @@ class GameViewModel @Inject constructor(
     fun onCorrect() {
         _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
         updateTeamScore(1)
+
     }
 
     fun onTabu() {
         _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
         updateTeamScore(-1)
+
     }
 
     fun getCurrentScore(): Int = _score.value
@@ -131,6 +134,7 @@ class GameViewModel @Inject constructor(
         if (_passCount.value > 0) {
             _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
             _passCount.value -= 1
+
         }
     }
 
