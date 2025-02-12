@@ -87,6 +87,7 @@ fun GameScrean(
 
     val showExitDialog = remember { mutableStateOf(false) }
     val showHomeDialog = remember { mutableStateOf(false) }
+    val showPauseDialog = remember { mutableStateOf(false) }
 
     BackHandler {
         showExitDialog.value = true
@@ -123,6 +124,56 @@ fun GameScrean(
         )
     }
 
+    if (showPauseDialog.value) {
+        AlertDialog(
+            containerColor = Color(0xFF6A57DB),
+            onDismissRequest = { },
+            title = { 
+                Text(
+                    text = "Oyun Duraklatıldı",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                ) 
+            },
+            text = { 
+                Text(
+                    text = "Ne yapmak istersiniz?",
+                    color = Color.White,
+                    fontSize = 16.sp
+                ) 
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showPauseDialog.value = false
+                        viewModel.resumeGame()
+                    }
+                ) {
+                    Text(
+                        text = "Devam Et",
+                        color = Color.Yellow,
+                        fontSize = 18.sp
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showPauseDialog.value = false
+                        navController.navigate(Screan.WelcomePage.route)
+                    }
+                ) {
+                    Text(
+                        text = "Oyundan Çık",
+                        color = Color.Red,
+                        fontSize = 18.sp
+                    )
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,9 +190,41 @@ fun GameScrean(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Row
-        TopPanel(onHomeClick = {
-            showHomeDialog.value = true
-        })
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { showHomeDialog.value = true },
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF6A57DB))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Home",
+                    tint = Color.White
+                )
+            }
+            
+            // Durdur butonu
+            Button(
+                onClick = {
+                    viewModel.pauseGame()
+                    showPauseDialog.value = true
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF6A57DB)
+                ),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .height(48.dp)
+            ) {
+                Text("Durdur", color = Color.White)
+            }
+        }
 
         TeamNameCompose(teamList[0], currentScore)
 
@@ -185,53 +268,7 @@ fun TeamNameCompose(team: TeamName, score: Int) {
     }
 }
 
-@Composable
-fun TopPanel(onHomeClick: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Sound Icon Placeholder
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF6A57DB)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "\uD83C\uDFA7", fontSize = 24.sp, color = Color.White)
-        }
 
-        // Pause Button
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFF8A72E0))
-                .padding(horizontal = 24.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Oyunu Durdur", color = Color.White, fontSize = 16.sp)
-        }
-
-        // Home Icon Placeholder
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF6A57DB))
-                .padding()
-                .clickable { onHomeClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Home",
-                tint = Color.White
-            )
-        }
-    }
-}
 
 @Composable
 fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentWordIndex: Int,gameTime:Int) {

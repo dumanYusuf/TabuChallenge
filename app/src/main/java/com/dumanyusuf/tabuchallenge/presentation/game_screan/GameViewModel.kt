@@ -40,8 +40,13 @@ class GameViewModel @Inject constructor(
     private val _passCount = MutableStateFlow<Int>(0)
     val passCount: StateFlow<Int> = _passCount
 
-    private val _time=MutableStateFlow<Int>(0)
-    val time:StateFlow<Int> =_time.asStateFlow()
+    private val _time = MutableStateFlow<Int>(0)
+    val time: StateFlow<Int> = _time.asStateFlow()
+
+    private val _isGamePaused = MutableStateFlow(false)
+    val isGamePaused: StateFlow<Boolean> = _isGamePaused.asStateFlow()
+
+    private var timerJob: kotlinx.coroutines.Job? = null
 
     init {
         fetchWords()
@@ -64,21 +69,36 @@ class GameViewModel @Inject constructor(
         isSecondTeam = secondTeam
         this.firstTeamScore = firstTeamScore
 
-        viewModelScope.launch {
-            _time.value = gameSettings.gameTime
+        startTimer(gameSettings.gameTime)
+    }
+
+    private fun startTimer(initialTime: Int) {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            _time.value = initialTime
             while (_time.value > 0) {
-                delay(1000)
-                _time.value--
+                if (!_isGamePaused.value) {
+                    delay(1000)
+                    _time.value--
+                } else {
+                    delay(100) // Check pause state every 100ms
+                }
             }
             
             if (isSecondTeam) {
-                // İkinci takımın süresi bitti, WinTeamPage'e yönlendir
                 _navigateToWinTeam.value = true
             } else {
-                // İlk takımın süresi bitti, NextTeamPage'e yönlendir
                 _navigateToNextTeam.value = true
             }
         }
+    }
+
+    fun pauseGame() {
+        _isGamePaused.value = true
+    }
+
+    fun resumeGame() {
+        _isGamePaused.value = false
     }
 
     fun getWinningTeam(): String {
