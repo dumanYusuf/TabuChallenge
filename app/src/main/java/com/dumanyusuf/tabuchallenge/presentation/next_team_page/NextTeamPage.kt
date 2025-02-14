@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.Screan
+import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -26,7 +27,7 @@ import kotlinx.coroutines.delay
 fun NextTeamPage(
     firstTeamScore: Int,
     gameSettings: String,
-    navController: NavController
+    navController: NavController,
 ) {
     var visible by remember { mutableStateOf(false) }
 

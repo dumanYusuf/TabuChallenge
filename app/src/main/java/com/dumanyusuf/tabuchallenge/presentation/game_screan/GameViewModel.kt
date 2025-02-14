@@ -146,7 +146,7 @@ class GameViewModel @Inject constructor(
 
     fun onTabu() {
         _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
-        updateTeamScore(-1)
+        updateTeamScore(-2)
     }
 
     fun getCurrentScore(): Int = _score.value

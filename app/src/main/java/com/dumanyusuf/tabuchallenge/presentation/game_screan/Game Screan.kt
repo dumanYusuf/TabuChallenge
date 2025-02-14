@@ -50,8 +50,7 @@ fun GameScrean(
     val gameSettingsObj = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
     LaunchedEffect(gameSettingsObj) {
-        viewModel.setPassCount(gameSettingsObj.roundCount)
-        // İkinci takım için firstTeamScore'u kontrol et
+        viewModel.setPassCount(gameSettingsObj.roundCount) // İkinci takım için firstTeamScore'u kontrol et
         val teamListObj = Gson().fromJson<List<TeamName>>(teamList, object : TypeToken<List<TeamName>>() {}.type)
         val firstTeamScore = teamListObj.firstOrNull()?.firstTeamScore ?: 0
         viewModel.timerGame(gameSettingsObj, firstTeamScore != 0, firstTeamScore)
@@ -228,7 +227,7 @@ fun GameScrean(
         TeamNameCompose(teamList[0], currentScore)
 
         // Timer & Words List
-        WordAndTimerSection(gameSettings = gameSettingsObj, words, currentWordIndex,time)
+        WordAndTimerSection(words, currentWordIndex,time)
 
         // Buttons Section
         ActionButtonsRow(viewModel::onCorrect, viewModel::onTabu, viewModel::onPass, passCount)
@@ -258,7 +257,7 @@ fun TeamNameCompose(team: TeamName, score: Int) {
                 fontSize = 24.sp
             )
             Text(
-                text = score.toString(),
+                text = "Skor:$score",
                 color = Color.White,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 4.dp)
@@ -268,7 +267,7 @@ fun TeamNameCompose(team: TeamName, score: Int) {
 }
 
 @Composable
-fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentWordIndex: Int,gameTime:Int) {
+fun WordAndTimerSection( words: List<Words>, currentWordIndex: Int,gameTime:Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally

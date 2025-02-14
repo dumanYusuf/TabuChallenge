@@ -152,11 +152,7 @@ fun TeamNamePage(
                             value = sliderValueTime.toString(),
                             tint = Color(0xFF4CAF50)
                         )
-                        GameSettingItem(
-                            icon = R.drawable.type,
-                            value = sliderValueType.toString(),
-                            tint = Color(0xFFFFEB3B)
-                        )
+
                         GameSettingItem(
                             icon = R.drawable.next,
                             value = sliderValueNext.toString(),
@@ -207,8 +203,6 @@ fun TeamNamePage(
                     GameSettingsDialog(
                         sliderValueTime = sliderValueTime,
                         onSliderValueTimeChange = { sliderValueTime = it },
-                        sliderValueType = sliderValueType,
-                        onSliderValueTypeChange = { sliderValueType = it },
                         sliderValueNext = sliderValueNext,
                         onSliderValueNextChange = { sliderValueNext = it },
                         onDismissRequest = { showGameSettingsDialog = false }
@@ -225,8 +219,6 @@ fun TeamNamePage(
 fun GameSettingsDialog(
     sliderValueTime: Int,
     onSliderValueTimeChange: (Int) -> Unit,
-    sliderValueType: Int,
-    onSliderValueTypeChange: (Int) -> Unit,
     sliderValueNext: Int,
     onSliderValueNextChange: (Int) -> Unit,
     onDismissRequest: () -> Unit
@@ -241,20 +233,11 @@ fun GameSettingsDialog(
                 Slider(
                     value = sliderValueTime.toFloat(),
                     onValueChange = {onSliderValueTimeChange(it.toInt())},
-                    valueRange = 10f..90f,
-                    steps = 9
+                    valueRange = 10f..120f,
+                    steps = 10
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Oyun Tipi Slider
-                Text("Tur Sayısı: $sliderValueType")
-                Slider(
-                    value = sliderValueType.toFloat(),
-                    onValueChange = { onSliderValueTypeChange(it.toInt()) },
-                    valueRange = 1f..5f,
-                    steps = 4
-                )
-                Spacer(modifier = Modifier.height(16.dp))
 
                 // Geçme Hakkı Slider
                 Text("Pas Hakkı: $sliderValueNext")
@@ -262,7 +245,7 @@ fun GameSettingsDialog(
                     value = sliderValueNext.toFloat(),
                     onValueChange = { onSliderValueNextChange(it.toInt()) },
                     valueRange = 1f..5f,
-                    steps = 4
+                    steps = 3
                 )
             }
         },
