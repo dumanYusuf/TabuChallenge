@@ -11,10 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -63,7 +61,7 @@ class GameViewModel @Inject constructor(
                 Log.d(TAG, "Firebase'den kelimeler isteniyor...")
                 savedWords = gameScreanUseCase.getWords()
                 Log.d(TAG, "Firebase'den alınan kelimeler savedWords'e kaydedildi: $savedWords")
-                
+
                 _wordsState.value = savedWords.shuffled()
                 Log.d(TAG, "İlk takım için kelimeler karıştırıldı ve _wordsState'e atandı: ${_wordsState.value}")
             } catch (e: Exception) {
@@ -76,7 +74,7 @@ class GameViewModel @Inject constructor(
         Log.d(TAG, "shuffleExistingWordsForSecondTeam() çağrıldı - İkinci takım için kelimeler hazırlanıyor")
         Log.d(TAG, "Mevcut savedWords: $savedWords")
         Log.d(TAG, "Mevcut _wordsState: ${_wordsState.value}")
-        
+
         // İkinci takım için sakladığımız kelimeleri karıştır
         _wordsState.value = savedWords.shuffled()
         Log.d(TAG, "İkinci takım için kelimeler karıştırıldı ve _wordsState güncellendi: ${_wordsState.value}")
@@ -86,7 +84,7 @@ class GameViewModel @Inject constructor(
         Log.d(TAG, "timerGame() çağrıldı - secondTeam: $secondTeam, firstTeamScore: $firstTeamScore")
         isSecondTeam = secondTeam
         this.firstTeamScore = firstTeamScore
-        
+
         if (secondTeam) {
             Log.d(TAG, "İkinci takım başlıyor - Mevcut kelimeler karıştırılacak")
             shuffleExistingWordsForSecondTeam()
@@ -111,7 +109,7 @@ class GameViewModel @Inject constructor(
                     delay(100) // Check pause state every 100ms
                 }
             }
-            
+
             if (isSecondTeam) {
                 _navigateToWinTeam.value = true
             } else {
@@ -137,7 +135,6 @@ class GameViewModel @Inject constructor(
         }
     }
 
-
     fun setPassCount(count: Int) {
         _passCount.value = count
     }
@@ -145,13 +142,11 @@ class GameViewModel @Inject constructor(
     fun onCorrect() {
         _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
         updateTeamScore(1)
-
     }
 
     fun onTabu() {
         _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
         updateTeamScore(-1)
-
     }
 
     fun getCurrentScore(): Int = _score.value
@@ -160,7 +155,6 @@ class GameViewModel @Inject constructor(
         if (_passCount.value > 0) {
             _currentWordIndex.value = (_currentWordIndex.value + 1) % _wordsState.value.size
             _passCount.value -= 1
-
         }
     }
 

@@ -47,7 +47,6 @@ fun GameScrean(
     val passCount = viewModel.passCount.collectAsState().value
     val time = viewModel.time.collectAsState().value
 
-
     val gameSettingsObj = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
     LaunchedEffect(gameSettingsObj) {
@@ -128,20 +127,20 @@ fun GameScrean(
         AlertDialog(
             containerColor = Color(0xFF6A57DB),
             onDismissRequest = { },
-            title = { 
+            title = {
                 Text(
                     text = "Oyun Duraklatıldı",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
-                ) 
+                )
             },
-            text = { 
+            text = {
                 Text(
                     text = "Ne yapmak istersiniz?",
                     color = Color.White,
                     fontSize = 16.sp
-                ) 
+                )
             },
             confirmButton = {
                 TextButton(
@@ -208,7 +207,7 @@ fun GameScrean(
                     tint = Color.White
                 )
             }
-            
+
             // Durdur butonu
             Button(
                 onClick = {
@@ -268,8 +267,6 @@ fun TeamNameCompose(team: TeamName, score: Int) {
     }
 }
 
-
-
 @Composable
 fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentWordIndex: Int,gameTime:Int) {
     Column(
@@ -306,10 +303,9 @@ fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentW
                     )
                 }
             } else {
-
                 CircularProgressIndicator(
-                    modifier = Modifier.padding()
-                    , color = Color.Red
+                    modifier = Modifier.padding(),
+                    color = Color.Red
                 )
             }
         }
@@ -378,12 +374,8 @@ fun ExitConfirmationDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    fontSize = 24.sp,
-                    color = Color.Red,
-                    text = dismissText
-                )
+            TextButton(onClick = onDismiss)
+            { Text( fontSize = 24.sp, color = Color.Red, text = dismissText )
             }
         }
     )
