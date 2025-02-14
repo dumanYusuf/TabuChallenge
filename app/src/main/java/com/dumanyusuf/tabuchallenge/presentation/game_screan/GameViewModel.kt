@@ -20,6 +20,9 @@ import javax.inject.Inject
 class GameViewModel @Inject constructor(
     private val gameScreanUseCase: GameScreanUseCase
 ) : ViewModel() {
+    private val TAG = "GameViewModel"
+    // İlk takımdan alınan kelimeleri saklayacağımız liste
+    private var savedWords: List<Words> = emptyList()
     private val _navigateToNextTeam = MutableStateFlow(false)
     val navigateToNextTeam: StateFlow<Boolean> = _navigateToNextTeam
 
@@ -50,25 +53,48 @@ class GameViewModel @Inject constructor(
     private var timerJob: kotlinx.coroutines.Job? = null
 
     init {
-        fetchWords()
-
+        fetchWordsForFirstTeam()
     }
 
-    private fun fetchWords() {
+    private fun fetchWordsForFirstTeam() {
+        Log.d(TAG, "fetchWordsForFirstTeam() çağrıldı - İlk takım için kelimeler alınıyor")
         viewModelScope.launch {
             try {
-                val words = gameScreanUseCase.getWords()
-                _wordsState.value = words.shuffled()
-                Log.d("GameViewModel", "Fetched words: $_wordsState")
+                Log.d(TAG, "Firebase'den kelimeler isteniyor...")
+                savedWords = gameScreanUseCase.getWords()
+                Log.d(TAG, "Firebase'den alınan kelimeler savedWords'e kaydedildi: $savedWords")
+                
+                _wordsState.value = savedWords.shuffled()
+                Log.d(TAG, "İlk takım için kelimeler karıştırıldı ve _wordsState'e atandı: ${_wordsState.value}")
             } catch (e: Exception) {
-                Log.e("GameViewModel", "Error fetching words", e)
+                Log.e(TAG, "Kelimeler alınırken hata oluştu: ${e.message}")
             }
         }
     }
 
+    private fun shuffleExistingWordsForSecondTeam() {
+        Log.d(TAG, "shuffleExistingWordsForSecondTeam() çağrıldı - İkinci takım için kelimeler hazırlanıyor")
+        Log.d(TAG, "Mevcut savedWords: $savedWords")
+        Log.d(TAG, "Mevcut _wordsState: ${_wordsState.value}")
+        
+        // İkinci takım için sakladığımız kelimeleri karıştır
+        _wordsState.value = savedWords.shuffled()
+        Log.d(TAG, "İkinci takım için kelimeler karıştırıldı ve _wordsState güncellendi: ${_wordsState.value}")
+    }
+
     fun timerGame(gameSettings: GameSettings, secondTeam: Boolean = false, firstTeamScore: Int = 0) {
+        Log.d(TAG, "timerGame() çağrıldı - secondTeam: $secondTeam, firstTeamScore: $firstTeamScore")
         isSecondTeam = secondTeam
         this.firstTeamScore = firstTeamScore
+        
+        if (secondTeam) {
+            Log.d(TAG, "İkinci takım başlıyor - Mevcut kelimeler karıştırılacak")
+            shuffleExistingWordsForSecondTeam()
+            _currentWordIndex.value = 0
+            Log.d(TAG, "İkinci takım için currentWordIndex sıfırlandı")
+        } else {
+            Log.d(TAG, "İlk takım başlıyor")
+        }
 
         startTimer(gameSettings.gameTime)
     }

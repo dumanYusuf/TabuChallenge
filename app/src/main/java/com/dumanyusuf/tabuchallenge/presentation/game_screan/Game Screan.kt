@@ -306,11 +306,10 @@ fun WordAndTimerSection(gameSettings: GameSettings, words: List<Words>, currentW
                     )
                 }
             } else {
-                Text(
-                    text = "No words available",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center
+
+                CircularProgressIndicator(
+                    modifier = Modifier.padding()
+                    , color = Color.Red
                 )
             }
         }
