@@ -1,6 +1,7 @@
 package com.dumanyusuf.tabuchallenge.presentation.welcome_page
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -26,12 +28,16 @@ import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.R
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.presentation.how_to_page.HowToPage
+import com.dumanyusuf.tabuchallenge.util.NetworkUtils
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun WelcomePage(
-    navcontroller:NavController
+    navcontroller: NavController,
+    context: Context = LocalContext.current
 ) {
+    var showNoInternetDialog by remember { mutableStateOf(false)
+    }
 
     Scaffold { paddingValues ->
         Box(
@@ -90,7 +96,11 @@ fun WelcomePage(
                 // Start Game Button
                 Button(
                     onClick = {
-                        navcontroller.navigate(Screan.TeamNamePage.route)
+                        if (NetworkUtils.isInternetAvailable(context)) {
+                            navcontroller.navigate(Screan.TeamNamePage.route)
+                        } else {
+                            showNoInternetDialog = true
+                        }
                     },
                     modifier = Modifier
                         .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -134,6 +144,41 @@ fun WelcomePage(
                         )
 
                 }
+            }
+
+            // İnternet bağlantısı olmadığında gösterilecek dialog
+            if (showNoInternetDialog) {
+                AlertDialog(
+                    onDismissRequest = { showNoInternetDialog = false },
+                    title = {
+                        Text(
+                            text = "İnternet Bağlantısı Yok",
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = "Oyunu oynayabilmek için internet bağlantınızın olması gerekmektedir. Lütfen internet bağlantınızı kontrol edip tekrar deneyiniz.",
+                            style = TextStyle(fontSize = 16.sp)
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showNoInternetDialog = false }
+                        ) {
+                            Text(
+                                text = "TAMAM",
+                                color = Color(0xFF6200EE),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    },
+                    containerColor = Color.White,
+                    shape = RoundedCornerShape(16.dp)
+                )
             }
         }
     }
