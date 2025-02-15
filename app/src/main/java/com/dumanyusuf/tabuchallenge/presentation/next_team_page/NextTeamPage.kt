@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dumanyusuf.tabuchallenge.Screan
 import com.dumanyusuf.tabuchallenge.domain.model.TeamName
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -27,6 +29,7 @@ import kotlinx.coroutines.delay
 fun NextTeamPage(
     firstTeamScore: Int,
     gameSettings: String,
+    teamList: String,
     navController: NavController,
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -121,8 +124,14 @@ fun NextTeamPage(
             ) {
                 Button(
                     onClick = {
-                        val teamList = "[{\"teamName\":\"Takım 2\",\"score\":0,\"firstTeamScore\":$firstTeamScore}]"
-                        navController.navigate(Screan.GameScreanPage.route + "/" + gameSettings + "/" + teamList)
+                        // TeamList'ten takım bilgilerini al
+                        val teamListObj = Gson().fromJson<List<TeamName>>(teamList, object : TypeToken<List<TeamName>>() {}.type)
+                        val team1Name = teamListObj[0].teamName
+                        val team2Name = teamListObj[1].teamName
+                        
+                        // Yeni teamList oluştur - her iki takımın bilgilerini içerecek şekilde
+                        val newTeamList = "[{\"teamName\":\"$team1Name\",\"score\":0,\"firstTeamScore\":$firstTeamScore},{\"teamName\":\"$team2Name\",\"score\":0,\"firstTeamScore\":$firstTeamScore}]"
+                        navController.navigate(Screan.GameScreanPage.route + "/" + gameSettings + "/" + newTeamList)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF8A72E0)

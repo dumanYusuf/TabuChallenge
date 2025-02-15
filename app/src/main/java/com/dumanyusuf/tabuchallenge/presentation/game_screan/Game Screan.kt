@@ -50,9 +50,13 @@ fun GameScrean(
     val gameSettingsObj = remember { Gson().fromJson(gameSettings, GameSettings::class.java) }
 
     LaunchedEffect(gameSettingsObj) {
-        viewModel.setPassCount(gameSettingsObj.roundCount) // İkinci takım için firstTeamScore'u kontrol et
+        viewModel.setPassCount(gameSettingsObj.roundCount)
         val teamListObj = Gson().fromJson<List<TeamName>>(teamList, object : TypeToken<List<TeamName>>() {}.type)
         val firstTeamScore = teamListObj.firstOrNull()?.firstTeamScore ?: 0
+        // Takım isimlerini GameViewModel'e ilet
+        val team1Name = teamListObj.firstOrNull()?.teamName ?: ""
+        val team2Name = if (teamListObj.size > 1) teamListObj[1].teamName else team1Name
+        viewModel.setTeamNames(team1Name, team2Name)
         viewModel.timerGame(gameSettingsObj, firstTeamScore != 0, firstTeamScore)
     }
 
@@ -67,17 +71,32 @@ fun GameScrean(
 
     LaunchedEffect(navigateToNextTeam) {
         if (navigateToNextTeam) {
-            // İlk takımın skorunu ve game settings'i NextTeamPage'e gönder
             val currentScore = viewModel.getCurrentScore()
-            navController.navigate(Screan.NextTeamPage.createRoute(currentScore, gameSettings))
+            // teamList'i JSON string'e çevir
+            val teamListJson = Gson().toJson(teamList)
+            navController.navigate(Screan.NextTeamPage.createRoute(
+                firstTeamScore = currentScore,
+                gameSettings = gameSettings,
+                teamList = teamListJson
+            ))
         }
     }
 
     LaunchedEffect(navigateToWinTeam) {
         if (navigateToWinTeam) {
-            // Kazanan takımı belirle ve WinTeamPage'e yönlendir
+            val team1Name = teamList[0].teamName
+            val team2Name = teamList[1].teamName
+            val team1Score = teamList[0].firstTeamScore
+            val team2Score = viewModel.getCurrentScore()
             val winningTeam = viewModel.getWinningTeam()
-            navController.navigate(Screan.WinTeamPage.createRoute(winningTeam))
+            
+            navController.navigate(Screan.WinTeamPage.createRoute(
+                winningTeam = winningTeam,
+                team1Name = team1Name,
+                team1Score = team1Score,
+                team2Name = team2Name,
+                team2Score = team2Score
+            ))
         }
     }
 
@@ -224,7 +243,10 @@ fun GameScrean(
             }
         }
 
-        TeamNameCompose(teamList[0], currentScore)
+        val currentTeam = viewModel.currentTeam.collectAsState().value
+        currentTeam?.let {
+            TeamNameCompose(it, currentScore)
+        }
 
         // Timer & Words List
         WordAndTimerSection(words, currentWordIndex,time)

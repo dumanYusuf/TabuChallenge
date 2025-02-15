@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dumanyusuf.tabuchallenge.domain.model.GameSettings
+import com.dumanyusuf.tabuchallenge.domain.model.TeamName
 import com.dumanyusuf.tabuchallenge.domain.model.Words
 import com.dumanyusuf.tabuchallenge.domain.use_case.game_screan.GameScreanUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,9 @@ class GameViewModel @Inject constructor(
 
     private var isSecondTeam = false
     private var firstTeamScore = 0
+    
+    private val _currentTeam = MutableStateFlow<TeamName?>(null)
+    val currentTeam: StateFlow<TeamName?> = _currentTeam
 
     private val _wordsState = MutableStateFlow<List<Words>>(emptyList())
     val wordsState: StateFlow<List<Words>> = _wordsState
@@ -71,11 +75,6 @@ class GameViewModel @Inject constructor(
     }
 
     private fun shuffleExistingWordsForSecondTeam() {
-        Log.d(TAG, "shuffleExistingWordsForSecondTeam() çağrıldı - İkinci takım için kelimeler hazırlanıyor")
-        Log.d(TAG, "Mevcut savedWords: $savedWords")
-        Log.d(TAG, "Mevcut _wordsState: ${_wordsState.value}")
-
-        // İkinci takım için sakladığımız kelimeleri karıştır
         _wordsState.value = savedWords.shuffled()
         Log.d(TAG, "İkinci takım için kelimeler karıştırıldı ve _wordsState güncellendi: ${_wordsState.value}")
     }
@@ -90,8 +89,12 @@ class GameViewModel @Inject constructor(
             shuffleExistingWordsForSecondTeam()
             _currentWordIndex.value = 0
             Log.d(TAG, "İkinci takım için currentWordIndex sıfırlandı")
+            // İkinci takımın bilgilerini güncelle
+            _currentTeam.value = TeamName(teamName = team2Name)
         } else {
             Log.d(TAG, "İlk takım başlıyor")
+            // İlk takımın bilgilerini güncelle
+            _currentTeam.value = TeamName(teamName = team1Name)
         }
 
         startTimer(gameSettings.gameTime)
@@ -106,7 +109,7 @@ class GameViewModel @Inject constructor(
                     delay(1000)
                     _time.value--
                 } else {
-                    delay(100) // Check pause state every 100ms
+                    delay(100)
                 }
             }
 
@@ -126,11 +129,19 @@ class GameViewModel @Inject constructor(
         _isGamePaused.value = false
     }
 
+    private var team1Name = ""
+    private var team2Name = ""
+
+    fun setTeamNames(team1: String, team2: String) {
+        team1Name = team1
+        team2Name = team2
+    }
+
     fun getWinningTeam(): String {
         val secondTeamScore = _score.value
         return when {
-            firstTeamScore > secondTeamScore -> "Takım 1"
-            secondTeamScore > firstTeamScore -> "Takım 2"
+            firstTeamScore > secondTeamScore -> team1Name
+            secondTeamScore > firstTeamScore -> team2Name
             else -> "Berabere"
         }
     }

@@ -22,9 +22,16 @@ import com.dumanyusuf.tabuchallenge.Screan
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+data class TeamScore(
+    val name: String,
+    val score: Int
+)
+
 @Composable
 fun WinTeamPage(
     winningTeam: String,
+    team1Score: TeamScore,
+    team2Score: TeamScore,
     navController: NavController
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -89,6 +96,56 @@ fun WinTeamPage(
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         )
+                        
+                        Spacer(modifier = Modifier.height(24.dp))
+                        
+                        // Takım 1 Skoru
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (team1Score.name == winningTeam) Color(0xFF6200EE) else Color(0xFF312A67))
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = team1Score.name,
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Skor: ${team1Score.score}",
+                                color = Color.White,
+                                fontSize = 18.sp
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Takım 2 Skoru
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (team2Score.name == winningTeam) Color(0xFF6200EE) else Color(0xFF312A67))
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = team2Score.name,
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Skor: ${team2Score.score}",
+                                color = Color.White,
+                                fontSize = 18.sp
+                            )
+                        }
                     }
                 }
             }
